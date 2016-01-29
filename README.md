@@ -94,6 +94,42 @@ delete(cats, ("_id" => m_oid))
 println(count(cats, ("name" => "Mokie")))
 ````
 
+Command Syntax
+--------------
+
+The `command_simple` function allows broad access to MongoDB actions. For example, creating an index:
+
+```julia
+command_simple(client,
+               "db",
+               Dict(
+                  "createIndexes" => "cats",
+                  "indexes" => [
+                      Dict(
+                          "key" => Dict("name" => 1),
+                          "name" => "cats_name",
+                          "unique" => 1)
+                      ]
+                  ))
+```
+
+`command_simple` returns a `BSONObject` reply, so you can also perform aggregations:
+
+```julia
+command_simple(client,
+               "db",
+               OrderedDict(
+                  "aggregate" => "cats",
+                  "pipeline" => [
+                      Dict("\$match" => Dict("age" => 19)),
+                      Dict("\$group" => Dict("_id" => "\$name", "count" => Dict("\$sum" => 1)))
+                  ]
+                )
+              )
+```
+
+Refer to the [MongoDB database commands docs](https://docs.mongodb.org/manual/reference/command/) for further commands.
+
 Contributing
 ------------
 
