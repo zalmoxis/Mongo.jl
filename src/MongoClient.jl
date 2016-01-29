@@ -27,6 +27,51 @@ export MongoClient
 show(io::IO, client::MongoClient) = print(io, "MongoClient($(client.uri))")
 export show
 
+"""
+Issues a command to MongoDB client through `mongoc_client_command_simple`.
+
+Possible commands: https://docs.mongodb.org/manual/reference/command/
+"""
+command_simple(
+    client::MongoClient, # mongoc_client_t
+    db_name::AbstractString, # const char
+    command::BSONObject#, # const bson_t
+    ) = begin
+    dbCStr = bytestring(db_name)
+    reply = BSONObject() # bson_t
+    bsonError = BSONError() # bson_error_t
+    ccall(
+        (:mongoc_client_command_simple, libmongoc),
+        Bool, (Ptr{Void}, Ptr{UInt8}, Ptr{Void}, Ptr{Void}, Ptr{Void}, Ptr{UInt8}),
+        client._wrap_,
+        dbCStr,
+        command._wrap_,
+        C_NULL,
+        reply._wrap_,
+        bsonError._wrap_
+        ) || error("update: $(string(bsonError))")
+    return reply
+end
+command_simple(
+    client::MongoClient,
+    db_name::AbstractString,
+    command::Associative
+    ) = command_simple(
+        client,
+        db_name,
+        BSONObject(command)
+        )
+command_simple(
+    client::MongoClient,
+    db_name::AbstractString,
+    command::NakedDict
+    ) = command_simple(
+        client,
+        db_name,
+        BSONObject(command)
+        )
+export command_simple
+
 # Private
 
 destroy(client::MongoClient) =

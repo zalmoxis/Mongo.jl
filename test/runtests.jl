@@ -1,4 +1,4 @@
-using FactCheck, LibBSON, Mongo
+using FactCheck, LibBSON, Mongo, DataStructures
 
 facts("Mongo") do
     client = MongoClient()
@@ -24,6 +24,17 @@ facts("Mongo") do
         for item in find(collection, ("_id" => oid), ("_id" => false, "hello" => true))
             @fact dict(item) --> Dict("hello" => "after")
         end
+    end
+
+    context("command_simple") do
+        reply = command_simple(
+            client,
+            "foo",
+            OrderedDict(
+               "count" => "bar",
+               "query" => Dict("_id" => oid))
+            )
+        @fact reply["n"] --> 1
     end
 
     context("delete") do
