@@ -5,6 +5,12 @@ facts("Mongo") do
     collection = MongoCollection(client, "foo", "bar")
     oid = BSONOID()
 
+    context("variables") do
+      @fact collection.client --> client
+      @fact collection.db --> "foo"
+      @fact collection.name --> "bar"
+    end
+
     context("insert") do
         insert(collection, ("_id" => oid, "hello" => "before"))
         @fact count(collection, ("_id" => oid)) --> 1
