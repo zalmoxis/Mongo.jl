@@ -1,5 +1,8 @@
 type MongoCollection
     _wrap_::Ptr{Void}
+    client::MongoClient
+    db::AbstractString
+    name::AbstractString
 
     MongoCollection(client::MongoClient, db::AbstractString, name::AbstractString) = begin
         dbCStr = bytestring(db)
@@ -9,7 +12,10 @@ type MongoCollection
                 (:mongoc_client_get_collection, libmongoc),
                 Ptr{Void}, (Ptr{Void}, Ptr{UInt8}, Ptr{UInt8}),
                 client._wrap_, dbCStr, nameCStr
-                )
+                ),
+            client,
+            db,
+            name
             )
         finalizer(collection, destroy)
         return collection

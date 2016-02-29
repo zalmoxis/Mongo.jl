@@ -31,7 +31,8 @@ using Mongo, LibBSON
 # Create a client connection
 client = MongoClient() # default locahost:27017
 
-# Get a handle to collection named "cats" in database "db"
+# Get a handle to collection named "cats" in database "db".
+# Client object, database name, and collection name are stored as variables.
 cats = MongoCollection(client, "db", "cats")
 
 # Insert a document
