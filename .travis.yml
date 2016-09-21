@@ -12,7 +12,6 @@ notifications:
 sudo: false
 script:
     - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-    - julia -e 'Pkg.clone(pwd()); Pkg.build("Mongo")'
-    - julia -e 'Pkg.test("Mongo", coverage=true)'
+    - julia -e 'Pkg.clone(pwd()); Pkg.build("Mongo"); Pkg.test("Mongo", coverage=true)'
 after_success:
     - if [ $JULIAVERSION = "juliareleases" ]; then julia -e 'cd(Pkg.dir("Mongo")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder())'; fi
