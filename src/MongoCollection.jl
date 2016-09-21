@@ -1,3 +1,6 @@
+using Compat
+import Compat.UTF8String
+
 type MongoCollection
     _wrap_::Ptr{Void}
     client::MongoClient
@@ -5,8 +8,8 @@ type MongoCollection
     name::AbstractString
 
     MongoCollection(client::MongoClient, db::AbstractString, name::AbstractString) = begin
-        dbCStr = bytestring(db)
-        nameCStr = bytestring(name)
+        dbCStr = Compat.UTF8String(db)
+        nameCStr = Compat.UTF8String(name)
         collection = new(
             ccall(
                 (:mongoc_client_get_collection, libmongoc),
