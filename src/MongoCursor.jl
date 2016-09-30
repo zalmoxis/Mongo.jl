@@ -32,6 +32,11 @@ done(cursor::MongoCursor, _::Void) = begin
 end
 export done
 
+if Base.VERSION > v"0.5.0-"
+Base.iteratorsize(::Type{MongoCursor}) = Base.SizeUnknown()
+end
+Base.eltype(::Type{MongoCursor}) = BSONObject
+
 destroy(collection::MongoCursor) =
     ccall(
         (:mongoc_cursor_destroy, libmongoc),
