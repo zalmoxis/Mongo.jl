@@ -20,7 +20,7 @@ atexit() do
     ccall((:mongoc_cleanup, libmongoc), Void, ())
 end
 
-typealias NakedDict Union{Pair,Tuple}
+const NakedDict = Union{Pair,Tuple}
 
 include("MongoClient.jl")
 include("MongoCollection.jl")
