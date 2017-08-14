@@ -1,5 +1,4 @@
 using Compat
-import Compat.UTF8String
 
 type MongoCollection
     _wrap_::Ptr{Void}
@@ -8,8 +7,8 @@ type MongoCollection
     name::AbstractString
 
     MongoCollection(client::MongoClient, db::AbstractString, name::AbstractString) = begin
-        dbCStr = Compat.UTF8String(db)
-        nameCStr = Compat.UTF8String(name)
+        dbCStr = String(db)
+        nameCStr = String(name)
         collection = new(
             ccall(
                 (:mongoc_client_get_collection, libmongoc),

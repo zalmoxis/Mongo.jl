@@ -1,12 +1,11 @@
 using Compat
-import Compat.UTF8String
 
 type MongoClient
     uri::AbstractString
     _wrap_::Ptr{Void}
 
     MongoClient(uri::AbstractString) = begin
-        uriCStr = Compat.UTF8String(uri)
+        uriCStr = String(uri)
         client = new(
             uri,
             ccall(
@@ -40,7 +39,7 @@ command_simple(
     db_name::AbstractString, # const char
     command::BSONObject#, # const bson_t
     ) = begin
-    dbCStr = Compat.UTF8String(db_name)
+    dbCStr = String(db_name)
     reply = BSONObject() # bson_t
     bsonError = BSONError() # bson_error_t
     ccall(
