@@ -1,3 +1,8 @@
+IMPORTANT: Looking for New Maintainer
+-------------------------------------
+
+Note that we are looking for a new maintainer for the Mongo.jl package.  If you are interested in taking over maintenance of Mongo.jl please contact peter dot zion at gmail dot com.
+
 Mongo.jl
 ===========
 
