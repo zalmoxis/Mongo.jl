@@ -1,15 +1,9 @@
-IMPORTANT: Looking for New Maintainer
--------------------------------------
-
-Note that we are looking for a new maintainer for the Mongo.jl package.  If you are interested in taking over maintenance of Mongo.jl please contact peter dot zion at gmail dot com.
 
 Mongo.jl
 ===========
 
 [![Build Status](https://api.travis-ci.org/pzion/Mongo.jl.svg?branch=master)](https://travis-ci.org/pzion/Mongo.jl)
-=======
 [![0.6 Status](http://pkg.julialang.org/badges/Mongo_0.6.svg)](http://pkg.julialang.org/?pkg=Mongo)
-[![0.5 Status](http://pkg.julialang.org/badges/Mongo_0.5.svg)](http://pkg.julialang.org/?pkg=Mongo)
 [![Coverage Status](https://img.shields.io/coveralls/pzion/Mongo.jl.svg)](https://coveralls.io/r/pzion/Mongo.jl?branch=master)
 
 [MongoDB](http://www.mongodb.org) bindings for [The Julia Language](http://julialang.org/)
