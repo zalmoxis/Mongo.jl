@@ -1,4 +1,5 @@
-type MongoCursor
+
+mutable struct MongoCursor
     _wrap_::Ptr{Void}
 
     MongoCursor(_wrap_::Ptr{Void}) = begin
@@ -11,18 +12,16 @@ export MongoCursor
 
 # Iterator
 
-start(cursor::MongoCursor) = nothing
-export start
+Base.start(cursor::MongoCursor) = nothing
 
-next(cursor::MongoCursor, state::Void) =
+Base.next(cursor::MongoCursor, state::Void) =
     (BSONObject(ccall(
         (:mongoc_cursor_current, libmongoc),
         Ptr{Void}, (Ptr{Void},),
         cursor._wrap_
         ), Union{}), state)
-export next
 
-done(cursor::MongoCursor, state::Void) = begin
+function Base.done(cursor::MongoCursor, state::Void)
     return !ccall(
         (:mongoc_cursor_next, libmongoc),
         Bool, (Ptr{Void}, Ptr{Ptr{Void}}),
@@ -30,11 +29,8 @@ done(cursor::MongoCursor, state::Void) = begin
         Array{Ptr{Void}}(1)
         )
 end
-export done
 
-if Base.VERSION > v"0.5.0-"
 Base.iteratorsize(::Type{MongoCursor}) = Base.SizeUnknown()
-end
 Base.eltype(::Type{MongoCursor}) = BSONObject
 
 destroy(collection::MongoCursor) =

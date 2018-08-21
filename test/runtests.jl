@@ -1,90 +1,98 @@
-using FactCheck, LibBSON, Mongo, DataStructures
 
-facts("Mongo") do
+using LibBSON, Mongo, Base.Test
+
+@testset "Mongo" begin
     client = MongoClient()
     collection = MongoCollection(client, "foo", "bar")
     oid = BSONOID()
 
-    context("variables") do
-      @fact collection.client --> client
-      @fact collection.db --> "foo"
-      @fact collection.name --> "bar"
+    @testset "variables" begin
+      @test collection.client == client
+      @test collection.db == "foo"
+      @test collection.name == "bar"
     end
 
-    context("insert") do
+    @testset "insert" begin
         insert(collection, ("_id" => oid, "hello" => "before"))
-        @fact count(collection, ("_id" => oid)) --> 1
-        @fact count(collection) --> 1
+        @test count(collection, ("_id" => oid)) == 1
+        @test count(collection) == 1
         for item in find(collection, ("_id" => oid), ("_id" => false, "hello" => true))
-            @fact dict(item) --> Dict("hello" => "before")
+            @test dict(item) == Dict("hello" => "before")
         end
     end
 
-    context("update") do
+    @testset "update" begin
         update(
             collection,
             ("_id" => oid),
             set("hello" => "after")
             )
-        @fact count(collection, ("_id" => oid)) --> 1
+
+        @test count(collection, ("_id" => oid)) == 1
         for item in find(collection, ("_id" => oid), ("_id" => false, "hello" => true))
-            @fact dict(item) --> Dict("hello" => "after")
+            @test dict(item) == Dict("hello" => "after")
         end
     end
 
-    context("command_simple") do
+    @testset "command_simple" begin
         reply = command_simple(
             client,
             "foo",
-            OrderedDict(
+            Dict(
                "count" => "bar",
                "query" => Dict("_id" => oid))
             )
-        @fact reply["n"] --> 1
+        @test reply["n"] == 1
     end
 
-    context("delete") do
+    @testset "delete" begin
         delete(
             collection,
             ("_id" => oid)
             )
-        @fact count(collection, ("_id" => oid)) --> 0
-        @fact count(collection) --> 0
+        @test count(collection, ("_id" => oid)) == 0
+        @test count(collection) == 0
     end
 end
 
-facts("Mongo: bad host/port") do
+@testset "Mongo: bad host/port" begin
     client = MongoClient("bad-host-name", 9999)
     collection = MongoCollection(client, "foo", "bar")
-    @fact_throws insert(collection, ("foo" => "bar"))
+    @test_throws ErrorException insert(collection, ("foo" => "bar"))
 end
 
-facts("Query building helpers") do
+@testset "Query building helpers" begin
     client = MongoClient()
     ppl = MongoCollection(client, "foo", "ppl")
     person(name, age) = insert(ppl, ("name" => name, "age" => age))
     person("Tim", 25)
     person("Jason", 21)
     person("Jim", 87)
-    context("orderby") do
-        @fact first(find(ppl, (query(), orderby("age" => -1))))["name"] --> "Jim"
-        @fact first(find(ppl, (query(), orderby("age" => 1))))["name"] --> "Jason"
+
+    @testset "orderby" begin
+        @test first(find(ppl, (query(), orderby("age" => -1))))["name"] == "Jim"
+        @test first(find(ppl, (query(), orderby("age" => 1))))["name"] == "Jason"
     end
-    context("gt and lt") do
-        @fact first(find(ppl, query("age" => lt(25))))["name"] --> "Jason"
-        @fact first(find(ppl, query("age" => gt(50))))["name"] --> "Jim"
+
+    @testset "gt and lt" begin
+        @test first(find(ppl, query("age" => lt(25))))["name"] == "Jason"
+        @test first(find(ppl, query("age" => gt(50))))["name"] == "Jim"
     end
-    context("in and nin") do
-        @fact first(find(ppl, query("age" => in([21]))))["name"] --> "Jason"
-        @fact first(find(ppl, query("age" => nin([21,25]))))["name"] --> "Jim"
+
+    @testset "in and nin" begin
+        @test first(find(ppl, query("age" => in([21]))))["name"] == "Jason"
+        @test first(find(ppl, query("age" => nin([21,25]))))["name"] == "Jim"
     end
-    context("eq and ne") do
-        @fact first(find(ppl, query("age" => eq(21))))["name"] --> "Jason"
-        @fact first(find(ppl, query("age" => ne(87))))["name"] == "Jim" --> false
+
+    @testset "eq and ne" begin
+        @test first(find(ppl, query("age" => eq(21))))["name"] == "Jason"
+        @test first(find(ppl, query("age" => ne(87))))["name"] != "Jim"
     end
-    context("update with operator") do
+
+    @testset "update with operator" begin
         update(ppl, ("age" => 87), set("age" => 88))
-        @fact first(find(ppl, query("name" => "Jim")))["age"] --> 88
+        @test first(find(ppl, query("name" => "Jim")))["age"] == 88
     end
+
     delete(ppl, ())
 end

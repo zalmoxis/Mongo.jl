@@ -1,6 +1,5 @@
-using Compat
 
-type MongoClient
+mutable struct MongoClient
     uri::AbstractString
     _wrap_::Ptr{Void}
 
@@ -26,19 +25,19 @@ MongoClient(host::AbstractString, user::AbstractString, password::AbstractString
 end
 export MongoClient
 
-show(io::IO, client::MongoClient) = print(io, "MongoClient($(client.uri))")
-export show
+Base.show(io::IO, client::MongoClient) = print(io, "MongoClient($(client.uri))")
 
 """
 Issues a command to MongoDB client through `mongoc_client_command_simple`.
 
 Possible commands: https://docs.mongodb.org/manual/reference/command/
 """
-command_simple(
+function command_simple(
     client::MongoClient, # mongoc_client_t
     db_name::AbstractString, # const char
     command::BSONObject#, # const bson_t
-    ) = begin
+    )
+
     dbCStr = String(db_name)
     reply = BSONObject() # bson_t
     bsonError = BSONError() # bson_error_t
@@ -54,6 +53,7 @@ command_simple(
         ) || error("update: $(string(bsonError))")
     return reply
 end
+
 command_simple(
     client::MongoClient,
     db_name::AbstractString,
@@ -63,6 +63,7 @@ command_simple(
         db_name,
         BSONObject(command)
         )
+
 command_simple(
     client::MongoClient,
     db_name::AbstractString,
