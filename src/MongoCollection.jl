@@ -1,6 +1,6 @@
 
 mutable struct MongoCollection
-    _wrap_::Ptr{Void}
+    _wrap_::Ptr{Cvoid}
     client::MongoClient
     db::AbstractString
     name::AbstractString
@@ -11,7 +11,7 @@ mutable struct MongoCollection
         collection = new(
             ccall(
                 (:mongoc_client_get_collection, libmongoc),
-                Ptr{Void}, (Ptr{Void}, Ptr{UInt8}, Ptr{UInt8}),
+                Ptr{Cvoid}, (Ptr{Cvoid}, Ptr{UInt8}, Ptr{UInt8}),
                 client._wrap_, dbCStr, nameCStr
                 ),
             client,
@@ -27,7 +27,7 @@ export MongoCollection
 function Base.show(io::IO, collection::MongoCollection)
     nameCStr = ccall(
         (:mongoc_collection_get_name, libmongoc),
-        Ptr{UInt8}, (Ptr{Void},),
+        Ptr{UInt8}, (Ptr{Cvoid},),
         collection._wrap_
         )
     name = unsafe_string(nameCStr)
@@ -51,7 +51,7 @@ function insert(
     bsonError = BSONError()
     ccall(
         (:mongoc_collection_insert, libmongoc),
-        Bool, (Ptr{Void}, Cint, Ptr{Void}, Ptr{Void}, Ptr{UInt8}),
+        Bool, (Ptr{Cvoid}, Cint, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{UInt8}),
         collection._wrap_,
         flags,
         document._wrap_,
@@ -92,7 +92,7 @@ function update(
     bsonError = BSONError()
     ccall(
         (:mongoc_collection_update, libmongoc),
-        Bool, (Ptr{Void}, Cint, Ptr{Void}, Ptr{Void}, Ptr{Void}, Ptr{UInt8}),
+        Bool, (Ptr{Cvoid}, Cint, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{UInt8}),
         collection._wrap_,
         flags,
         selector._wrap_,
@@ -142,7 +142,7 @@ function Base.find(
 
     result = ccall(
         (:mongoc_collection_find, libmongoc),
-        Ptr{Void}, (Ptr{Void}, Cint, UInt32, UInt32, UInt32, Ptr{Void}, Ptr{Void}, Ptr{Void}),
+        Ptr{Cvoid}, (Ptr{Cvoid}, Cint, UInt32, UInt32, UInt32, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}),
         collection._wrap_,
         flags,
         skip,
@@ -185,7 +185,7 @@ function Base.find(
 
     result = ccall(
         (:mongoc_collection_find, libmongoc),
-        Ptr{Void}, (Ptr{Void}, Cint, UInt32, UInt32, UInt32, Ptr{Void}, Ptr{Void}, Ptr{Void}),
+        Ptr{Cvoid}, (Ptr{Cvoid}, Cint, UInt32, UInt32, UInt32, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{Cvoid}),
         collection._wrap_,
         flags,
         skip,
@@ -232,7 +232,7 @@ function Base.count(
     bsonError = BSONError()
     result = ccall(
         (:mongoc_collection_count, libmongoc),
-        Int64, (Ptr{Void}, Cint, Ptr{Void}, Int64, Int64, Ptr{Void}, Ptr{UInt8}),
+        Int64, (Ptr{Cvoid}, Cint, Ptr{Cvoid}, Int64, Int64, Ptr{Cvoid}, Ptr{UInt8}),
         collection._wrap_,
         flags,
         queryBSON._wrap_,
@@ -278,7 +278,7 @@ delete(
     bsonError = BSONError()
     result = ccall(
         (:mongoc_collection_delete, libmongoc),
-        Bool, (Ptr{Void}, Cint, Ptr{Void}, Ptr{Void}, Ptr{UInt8}),
+        Bool, (Ptr{Cvoid}, Cint, Ptr{Cvoid}, Ptr{Cvoid}, Ptr{UInt8}),
         collection._wrap_,
         flags,
         selector._wrap_,
@@ -306,6 +306,6 @@ export delete
 destroy(collection::MongoCollection) =
     ccall(
         (:mongoc_collection_destroy, libmongoc),
-        Void, (Ptr{Void},),
+        Cvoid, (Ptr{Cvoid},),
         collection._wrap_
         )
