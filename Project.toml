@@ -1,0 +1,11 @@
+name = "Mongo"
+uuid = "33bf5651-26d2-4a8f-8c4f-ed584fe1e194"
+version = "0.1.0"
+
+[deps]
+
+[compat]
+
+[extras]
+
+[targets]
